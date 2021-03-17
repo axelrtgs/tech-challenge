@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Undo changes made in alias
+
+if [[ "$(basename -- "$0")" == "unalias" ]]; then
+    echo "Error: source unalias" >&2
+    exit 1
+fi
+
+unalias kubectl

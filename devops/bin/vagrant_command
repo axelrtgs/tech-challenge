@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Execute microk8s commands via SSH
+
+if [ ! -f ./auto_gen/ssh_config ]; then
+  vagrant ssh-config > ./auto_gen/ssh_config
+fi
+
+ssh -F ./auto_gen/ssh_config -q -t k8s01 "$@"

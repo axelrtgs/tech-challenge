@@ -1,0 +1,72 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: challenge
+  namespace: flinks
+  annotations:
+    checkov.io/skip1: CKV_K8S_43=Accepting not to use digest for image versions
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: challenge
+  template:
+    metadata:
+      labels:
+        app: challenge
+    spec:
+      securityContext: &securityContext
+        seccompProfile:
+          type: RuntimeDefault
+        runAsUser: 15000
+        runAsGroup: 30000
+        runAsNonRoot: true
+      automountServiceAccountToken: false
+      volumes:
+        - name: webdata
+          emptyDir: {}
+      initContainers:
+        - image: busybox:stable
+          name: web-content
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: webdata
+              mountPath: "/webdata"
+          command:
+            - /bin/sh
+            - -c
+            - echo "<h1>Hello Flinks​</h1>" > /webdata/index.html
+          resources: &resources
+            requests:
+              memory: "32Mi"
+              cpu: "200m"
+            limits:
+              memory: "64Mi"
+              cpu: "250m"
+          securityContext: &securityContextContainer
+            <<: *securityContext
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - NET_RAW
+                - ALL
+      containers:
+        - image: nginx:1.19
+          name: challenge
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: webdata
+              mountPath: "/usr/share/nginx/html"
+          ports:
+            - containerPort: 80
+          resources: *resources
+          securityContext: *securityContextContainer
+          livenessProbe: &probeconf
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe: *probeconf

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Source this script if you want to avoid prefixing commands with `./bin/vagrant_command`
+
+if [[ "$(basename -- "$0")" == "alias" ]]; then
+    echo "Error: source alias" >&2
+    exit 1
+fi
+
+alias kubectl='./bin/vagrant_command kubectl'

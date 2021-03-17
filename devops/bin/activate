@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Source this script if you want to use kubectl on the host
+
+if [[ "$(basename -- "$0")" == "activate" ]]; then
+    echo "Error: source activate" >&2
+    exit 1
+fi
+
+export KUBECONFIG_SAVED_MICROK8S="${KUBECONFIG}"
+
+export KUBECONFIG="${PWD}/auto_gen/.kube_config"

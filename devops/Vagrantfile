@@ -1,0 +1,44 @@
+Vagrant.configure('2') do |config|
+  config.vm.box = 'ubuntu/bionic64'
+
+  config.vm.network 'public_network',
+    use_dhcp_assigned_default_route: true,
+    # remove this to select interactively or configure to your interface name
+    bridge: 'en9: Thunderbolt Ethernet Slot  2'
+
+  config.vm.provider 'virtualbox' do |vb|
+    vb.memory = 4096
+    vb.cpus = 2
+    # disable generating ubuntu-bionic-18.04-cloudimg-console.log file in the shared folder
+    vb.customize [ 'modifyvm', :id, '--uartmode1', 'disconnected' ]
+  end
+
+  config.vm.provision 'shell', path: "#{File.dirname(__FILE__)}/provisioning/microk8s_provision.sh"
+
+  config.vm.define 'k8s01' do |k8s01|
+    k8s01.vm.hostname = 'k8s01'
+    k8s01.vm.provider 'virtualbox' do |vb|
+      vb.name = 'k8s01'
+    end
+
+    k8s01.vm.provision 'shell', path: "#{File.dirname(__FILE__)}/provisioning/masternode_provision.sh"
+  end
+
+  config.vm.define 'k8s02' do |k8s02|
+    k8s02.vm.hostname = 'k8s02'
+    k8s02.vm.provider 'virtualbox' do |vb|
+      vb.name = 'k8s02'
+    end
+
+    k8s02.vm.provision 'shell', path: "#{File.dirname(__FILE__)}/provisioning/slavenode_provision.sh"
+  end
+
+  config.vm.define 'k8s03' do |k8s03|
+    k8s03.vm.hostname = 'k8s03'
+    k8s03.vm.provider 'virtualbox' do |vb|
+      vb.name = 'k8s03'
+    end
+
+    k8s03.vm.provision 'shell', path: "#{File.dirname(__FILE__)}/provisioning/slavenode_provision.sh"
+  end
+end

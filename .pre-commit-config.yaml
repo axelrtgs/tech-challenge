@@ -1,0 +1,47 @@
+---
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-executables-have-shebangs
+      - id: check-yaml
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.26.0
+    hooks:
+      - id: yamllint
+
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.12
+    hooks:
+      - id: shellcheck
+
+  - repo: https://github.com/frnmst/md-toc
+    rev: 7.1.0
+    hooks:
+      - id: md-toc
+        args: [-p, --skip-lines, '2', 'github']
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.26.0
+    hooks:
+      - id: markdownlint
+
+  - repo: https://github.com/Agilicus/pre-commit-hook-k8svalidate
+    rev: v0.0.8
+    hooks:
+      - id: k8svalidate
+        args: [--strict]
+        files: .yaml$
+
+  - repo: https://github.com/bridgecrewio/checkov
+    rev: '1.0.837'
+    hooks:
+      - id: checkov
+        verbose: true
+        files: .yaml$
+        args: [--quiet]
